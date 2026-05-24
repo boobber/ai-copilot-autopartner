@@ -1,0 +1,7 @@
+﻿SKU,Kategoria,Producent,Pojazd_Kompatybilny,Cena_Katalogowa,Min_Marza_Procent,Zapas_WMS
+BRK-001,Klocki Hamulcowe,Bosch,Skoda Octavia III 2018 2.0 TDI,180,15,Dostępny (Magazyn Centralny)
+BRK-002,Klocki Hamulcowe,ATE,Skoda Octavia III 2018 2.0 TDI,220,18,Dostępny (Oddział Lokalny)
+BRK-003,Tarcze Hamulcowe,Brembo,Skoda Octavia III 2018 2.0 TDI,350,20,Dostępny (Oddział Lokalny)
+FLT-001,Filtr Oleju,Mann-Filter,VW Passat 2016 2.0 TDI,45,10,Dostępny (Oddział Lokalny)
+FLT-002,Filtr Kabinowy,Filtron,VW Passat 2016 2.0 TDI,35,12,Brak (Dostawa 24h)
+SUS-001,Amortyzator,Sachs,Ford Master 2019,410,15,Dostępny (Magazyn Centralny)
