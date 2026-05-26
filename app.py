@@ -35,8 +35,8 @@ if "analiza_zrobiona" not in st.session_state:
 if "wartosc_rabatu" not in st.session_state:
     st.session_state.wartosc_rabatu = 10  # Domyślny rabat startowy
 
-# Akcja analizy
-if st.button("Analizuj zapytanie i dobierz części", type="primary"):
+# Akcja analizy - usunięto type="primary", aby niebieski był tylko przycisk zamówienia
+if st.button("Analizuj zapytanie i dobierz części"):
     st.session_state.analiza_zrobiona = True
     with st.spinner("Analiza NLP zapytania i przeszukiwanie bazy wektorowej..."):
         time.sleep(1.5)
@@ -85,42 +85,55 @@ if st.session_state.analiza_zrobiona:
             st.write(f"**Liczba wybranych części:** {len(wybrane_czesci)} szt.")
             st.write(f"**Cena wyjściowa pakietu:** {cena_katalogowa:.2f} PLN")
 
-            # --- CSS DLA SUWAKA ---
+            # --- CSS DLA SUWAKA I PRZYCISKU ---
             aktualny_rabat = st.session_state.wartosc_rabatu
             
+            # Definiujemy jeden, konkretny kolor dla danej sytuacji
             if aktualny_rabat > srednia_min_marza:
-                kolor_glowny = "#FF4B4B" # Intensywny czerwony
-                kolor_tla = "#FFCCCC"    # Jasnoczerwony dla reszty paska
+                kolor = "#FF4B4B" # Czerwony
             else:
-                kolor_glowny = "#28A745" # Intensywny zielony
-                kolor_tla = "#D4EDDA"    # Jasnozielony dla reszty paska
+                kolor = "#28A745" # Zielony
 
             st.markdown(f"""
                 <style>
-                    /* Zmiana tła dla CAŁEGO suwaka (niezaznaczona część) */
+                    /* Cała linia suwaka (tło i aktywny pasek) w JEDNYM kolorze */
                     div[data-testid="stSlider"] div[data-baseweb="slider"] > div {{
-                        background: {kolor_tla} !important;
+                        background: {kolor} !important;
                     }}
-                    /* Zmiana koloru aktywnego paska (zaznaczona część) */
                     div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {{
-                        background: {kolor_glowny} !important;
+                        background: {kolor} !important;
                     }}
+                    
                     /* Kropka suwaka */
                     div[data-testid="stSlider"] div[role="slider"] {{
-                        background-color: {kolor_glowny} !important;
-                        border-color: {kolor_glowny} !important;
-                        box-shadow: 0 0 10px {kolor_glowny}60 !important;
+                        background-color: {kolor} !important;
+                        border-color: {kolor} !important;
+                        box-shadow: 0 0 10px {kolor}60 !important;
                     }}
-                    /* Powiększona liczba nad kropką (tooltip) */
+                    
+                    /* Powiększona liczba nad kropką (tooltip) i jej kolor */
                     div[data-testid="stSlider"] div[role="slider"] > div {{
                         font-size: 24px !important;
                         font-weight: 900 !important;
-                        color: {kolor_glowny} !important;
+                        color: {kolor} !important;
                     }}
-                    /* Powiększenie tytułu samego suwaka */
+                    
+                    /* Kolor i rozmiar tekstu w etykiecie nad suwakiem (w tym procentu) */
                     div[data-testid="stSlider"] label {{
                         font-size: 20px !important;
                         font-weight: bold !important;
+                        color: {kolor} !important;
+                    }}
+
+                    /* Zmiana koloru przycisku "primary" (Złóż zamówienie) na niebieski */
+                    div[data-testid="stButton"] button[kind="primary"] {{
+                        background-color: #007BFF !important;
+                        border-color: #007BFF !important;
+                        color: white !important;
+                    }}
+                    div[data-testid="stButton"] button[kind="primary"]:hover {{
+                        background-color: #0056b3 !important;
+                        border-color: #0056b3 !important;
                     }}
                 </style>
             """, unsafe_allow_html=True)
@@ -149,7 +162,7 @@ if st.session_state.analiza_zrobiona:
 
             st.divider()
             
-            # --- ZŁÓŻ ZAMÓWIENIE ---
+            # --- ZŁÓŻ ZAMÓWIENIE (Przycisk na niebiesko) ---
             if st.button("🛒 Złóż zamówienie", type="primary", use_container_width=True):
                 st.success("✅ Zamówienie zostało pomyślnie skompletowane i przesłane do systemu ERP! Generowanie listu przewozowego...")
                 st.balloons() # Efekt wizualny potwierdzający akcję
