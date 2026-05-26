@@ -107,7 +107,7 @@ if st.session_state.analiza_zrobiona:
                     /* Czysta, cienka linia suwaka (Track) - cała w jednym kolorze */
                     div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {{
                         background: {kolor} !important;
-                        height: 4px !important; /* Ograniczenie grubości do cienkiej linii */
+                        height: 4px !important;
                     }}
                     
                     /* Opcjonalne usunięcie innego ewentualnego tła z domyślnego paska */
@@ -168,4 +168,19 @@ if st.session_state.analiza_zrobiona:
             if proponowany_rabat > srednia_min_marza:
                 st.error(
                     f"⚠️ **UWAGA:** Udzielony rabat ({proponowany_rabat}%) jest wyższy niż średnia "
-                    f"minimalna marża tego pakietu ({srednia_min
+                    f"minimalna marża tego pakietu ({srednia_min_marza:.1f}%). Oferta wymaga akceptacji kierownika."
+                )
+            else:
+                st.success(
+                    f"✅ **Rabat w normie:** {proponowany_rabat}% to bezpieczna wartość. Marża operacyjna jest chroniona."
+                )
+
+            st.divider()
+            
+            # --- ZŁÓŻ ZAMÓWIENIE ---
+            if st.button("🛒 Złóż zamówienie", type="primary", use_container_width=True):
+                st.success("✅ Zamówienie zostało pomyślnie skompletowane i przesłane do systemu ERP! Generowanie listu przewozowego...")
+                st.balloons() 
+
+    else:
+        st.warning("Brak części spełniających kryteria w bazie danych.")
