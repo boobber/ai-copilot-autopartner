@@ -93,26 +93,24 @@ if st.session_state.analiza_zrobiona:
             else:
                 kolor = "#28A745" # Zielony
 
-            # Zoptymalizowany kod CSS - niszczy tło, zostawia samą linię
+            # Zoptymalizowany kod CSS - ujednolica kolory obu stron osi
             st.markdown(f"""
                 <style>
-                    /* Całkowite ukrycie tła w kontenerach suwaka */
+                    /* Całkowite ukrycie ewentualnego tła w kontenerach suwaka */
                     div[data-testid="stSlider"] > div {{
                         background: transparent !important;
                     }}
-                    div[data-baseweb="slider"] {{
-                        background: transparent !important;
-                    }}
                     
-                    /* Czysta, cienka linia suwaka (Track) - cała w jednym kolorze */
-                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {{
+                    /* Prawa strona linii (nieaktywna) - ten sam kolor co reszta */
+                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div {{
                         background: {kolor} !important;
                         height: 4px !important;
                     }}
                     
-                    /* Opcjonalne usunięcie innego ewentualnego tła z domyślnego paska */
-                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div {{
-                        background: transparent !important;
+                    /* Lewa strona linii (aktywna/wypełniona) - ten sam kolor co reszta */
+                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {{
+                        background: {kolor} !important;
+                        height: 4px !important;
                     }}
                     
                     /* Kropka suwaka */
