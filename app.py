@@ -2,21 +2,26 @@ import streamlit as st
 import pandas as pd
 import time
 
+# Konfiguracja strony
 st.set_page_config(page_title="AI Sales Copilot", page_icon="🤖", layout="wide")
 
 @st.cache_data
 def load_data():
-    # ✅ CSV jest w UTF-8 — czytamy wprost
+    # Odczyt pliku CSV z jawnym kodowaniem utf-8 dla polskich znaków
     return pd.read_csv("katalog_czesci.csv", sep=",", encoding="utf-8")
 
+# Wczytanie danych
 df = load_data()
 
+# Nagłówek aplikacji
 st.title("🤖 AI Sales Copilot - AutoPartner Max S.A.")
 st.markdown("Asystent RAG wspierający proces ofertowania i weryfikację marży.")
 
+# Pasek boczny (Sidebar)
 st.sidebar.header("Ustawienia Copilota")
 st.sidebar.info("Model: Wewnętrzny RAG (Grounded)\n\nTryb: Human-in-the-Loop")
 
+# Pole tekstowe dla zapytania od klienta
 query = st.text_area(
     "Wklej zapytanie od klienta (mail / SMS / transkrypcja):",
     height=100,
@@ -24,53 +29,78 @@ query = st.text_area(
           "Klient chce coś rozsądnego cenowo, ale nie najtańsze. Dostawa na dzisiaj."
 )
 
+# Główna akcja po kliknięciu przycisku
 if st.button("Analizuj zapytanie i dobierz części", type="primary"):
     with st.spinner("Analiza NLP zapytania i przeszukiwanie bazy wektorowej..."):
-        time.sleep(1.5)
+        time.sleep(1.5) # Symulacja działania modelu
+        
+        st.subheader("1. Zidentyfikowane potrzeby (Ekstrakcja NLP)")
+        st.write("- **Pojazd:** Skoda Octavia III 2018 2.0 TDI")
+        st.write("- **Kategoria:** Hamulce (komplet: przód/tył)")
+        st.write("- **Priorytet:** Średnia półka cenowa, natychmiastowa dostępność")
 
-        st.subheader("1. Zrozumienie intencji (Ekstrakcja AI)")
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Rozpoznany Pojazd", "Skoda Octavia III (2018) 2.0 TDI")
-        col2.metric("Poszukiwana Kategoria", "Układ hamulcowy")
-        col3.metric("Priorytet Czasowy", "Wysoki (Na dzisiaj)")
-
-        st.divider()
-
-        st.subheader("2. Rekomendowane Części (Matching z bazą)")
-
+        # Symulowane wyszukiwanie w bazie (filtracja DataFrame dla fraz "Hamulc" i "Octavia")
         results = df[
-            df['Pojazd_Kompatybilny'].str.contains("Octavia", case=False, na=False)
+            df["Kategoria"].str.contains("Hamulc", case=False, na=False) &
+            df["Pojazd_Kompatybilny"].str.contains("Octavia", case=False, na=False)
         ]
 
         if not results.empty:
-            st.dataframe(results, use_container_width=True)
+            st.subheader("2. Propozycje AI (Wybierz części do oferty)")
+            
+            # Przygotowanie danych do interaktywnej tabeli
+            df_wybor = results.copy()
+            # Wstawienie kolumny z checkboxem na samym początku
+            df_wybor.insert(0, "Wybierz", False)
+            
+            # Interaktywna tabela
+            edytowany_df = st.data_editor(
+                df_wybor,
+                hide_index=True,
+                use_container_width=True,
+                column_config={
+                    "Wybierz": st.column_config.CheckboxColumn(
+                        "Dodaj do koszyka", default=False
+                    )
+                },
+                disabled=results.columns # Zablokowanie edycji oryginalnych kolumn z bazy
+            )
+            
+            # Filtrujemy tylko zaznaczone części przez sprzedawcę
+            wybrane_czesci = edytowany_df[edytowany_df["Wybierz"] == True]
 
             st.divider()
 
             st.subheader("3. Moduł Ochrony Marży (Dynamic Pricing)")
-
-            cena_katalogowa = results['Cena_Katalogowa'].sum()
-            srednia_min_marza = results['Min_Marza_Procent'].mean()
-
-            proponowany_rabat = st.slider("Zaproponuj rabat dla warsztatu (%)", 0, 30, 10)
-            cena_po_rabacie = cena_katalogowa * (1 - proponowany_rabat / 100)
-
-            st.write(f"**Cena wyjściowa pakietu:** {cena_katalogowa:.2f} PLN")
-            st.write(f"**Cena po rabacie:** {cena_po_rabacie:.2f} PLN")
-
-            if proponowany_rabat >= srednia_min_marza:
-                st.error(
-                    f"⚠️ UWAGA! Udzielony rabat ({proponowany_rabat}%) zagraża minimalnej marży "
-                    f"operacyjnej ({srednia_min_marza:.1f}%). Wymagana zgoda kierownika."
-                )
+            
+            # Sprawdzenie, czy cokolwiek zostało dodane do koszyka
+            if wybrane_czesci.empty:
+                st.info("👆 Zaznacz co najmniej jedną część z tabeli powyżej, aby zbudować pakiet i przeliczyć ofertę.")
             else:
-                st.success(f"✅ Rabat {proponowany_rabat}% jest bezpieczny. Marża chroniona.")
+                # Obliczenia bazujące tylko na wybranych pozycjach
+                cena_katalogowa = wybrane_czesci['Cena_Katalogowa'].sum()
+                srednia_min_marza = wybrane_czesci['Min_Marza_Procent'].mean()
 
-            st.divider()
+                st.write(f"**Liczba wybranych części:** {len(wybrane_czesci)} szt.")
+                st.write(f"**Cena wyjściowa pakietu:** {cena_katalogowa:.2f} PLN")
 
-            if st.button("Autoryzuj i wygeneruj ofertę PDF (Human-in-the-loop)"):
-                st.balloons()
-                st.success("Oferta została zatwierdzona i wysłana do klienta. Logi zasiliły proces Retreningu AI.")
+                # Interaktywny suwak do wyboru rabatu
+                proponowany_rabat = st.slider("Ustal rabat dla warsztatu (%)", 0, 30, 10)
+                
+                # Przeliczenie ceny ostatecznej
+                cena_po_rabacie = cena_katalogowa * (1 - proponowany_rabat / 100)
 
+                st.markdown(f"### Cena ostateczna po rabacie: {cena_po_rabacie:.2f} PLN")
+
+                # Weryfikacja poziomu rabatu względem średniej minimalnej marży koszyka
+                if proponowany_rabat > srednia_min_marza:
+                    st.error(
+                        f"⚠️ **UWAGA:** Udzielony rabat ({proponowany_rabat}%) jest wyższy niż średnia "
+                        f"minimalna marża tego pakietu ({srednia_min_marza:.1f}%). Oferta wymaga akceptacji kierownika."
+                    )
+                else:
+                    st.success(
+                        f"✅ **Rabat w normie:** {proponowany_rabat}% to bezpieczna wartość. Marża operacyjna jest chroniona."
+                    )
         else:
-            st.warning("Brak części w zaufanym katalogu dla tego zapytania. (Blokada halucynacji)")
+            st.warning("Brak części spełniających kryteria w bazie danych.")
