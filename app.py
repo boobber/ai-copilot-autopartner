@@ -93,21 +93,79 @@ if st.session_state.analiza_zrobiona:
             else:
                 kolor = "#28A745" # Zielony
 
-            # Zoptymalizowany kod CSS - koloruje wyłącznie cienką linię, kropkę i tekst
+            # Zoptymalizowany kod CSS - niszczy tło, zostawia samą linię
             st.markdown(f"""
                 <style>
-                    /* Wyczyszczenie tła wokół kontenera (usuwa szeroki zielony/czerwony pas) */
+                    /* Całkowite ukrycie tła w kontenerach suwaka */
+                    div[data-testid="stSlider"] > div {{
+                        background: transparent !important;
+                    }}
+                    div[data-baseweb="slider"] {{
+                        background: transparent !important;
+                    }}
+                    
+                    /* Czysta, cienka linia suwaka (Track) - cała w jednym kolorze */
+                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {{
+                        background: {kolor} !important;
+                        height: 4px !important; /* Ograniczenie grubości do cienkiej linii */
+                    }}
+                    
+                    /* Opcjonalne usunięcie innego ewentualnego tła z domyślnego paska */
                     div[data-testid="stSlider"] div[data-baseweb="slider"] > div {{
                         background: transparent !important;
                     }}
                     
-                    /* Cienka linia suwaka - cała w jednym kolorze (prawa i lewa strona) */
-                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {{
-                        background: {kolor} !important;
-                    }}
-                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div > div {{
-                        background: {kolor} !important;
+                    /* Kropka suwaka */
+                    div[data-testid="stSlider"] div[role="slider"] {{
+                        background-color: {kolor} !important;
+                        border: 2px solid {kolor} !important;
+                        box-shadow: none !important;
                     }}
                     
-                    /* Kropka suwaka */
-                    div
+                    /* Dymek z cyfrą (Tooltip) - białe tło dla czytelności */
+                    div[data-testid="stSlider"] div[role="slider"] > div {{
+                        font-size: 20px !important;
+                        font-weight: 900 !important;
+                        color: {kolor} !important;
+                        background-color: white !important;
+                        border: 2px solid {kolor} !important;
+                        border-radius: 6px !important;
+                        padding: 2px 8px !important;
+                    }}
+                    
+                    /* Etykieta nad suwakiem */
+                    div[data-testid="stSlider"] label {{
+                        font-size: 20px !important;
+                        font-weight: bold !important;
+                        color: {kolor} !important;
+                    }}
+
+                    /* Przycisk zamówienia (Niebieski) */
+                    div[data-testid="stButton"] button[kind="primary"] {{
+                        background-color: #007BFF !important;
+                        border-color: #007BFF !important;
+                        color: white !important;
+                    }}
+                    div[data-testid="stButton"] button[kind="primary"]:hover {{
+                        background-color: #0056b3 !important;
+                        border-color: #0056b3 !important;
+                    }}
+                </style>
+            """, unsafe_allow_html=True)
+
+            # --- SUWAK ---
+            proponowany_rabat = st.slider(
+                f"Ustal rabat dla warsztatu ({aktualny_rabat}%)", 
+                min_value=0, 
+                max_value=30, 
+                key="wartosc_rabatu"
+            )
+            
+            # --- PODSUMOWANIE ---
+            cena_po_rabacie = cena_katalogowa * (1 - proponowany_rabat / 100)
+            st.markdown(f"### Cena ostateczna po rabacie: {cena_po_rabacie:.2f} PLN")
+
+            if proponowany_rabat > srednia_min_marza:
+                st.error(
+                    f"⚠️ **UWAGA:** Udzielony rabat ({proponowany_rabat}%) jest wyższy niż średnia "
+                    f"minimalna marża tego pakietu ({srednia_min
