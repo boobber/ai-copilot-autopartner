@@ -35,7 +35,7 @@ if "analiza_zrobiona" not in st.session_state:
 if "wartosc_rabatu" not in st.session_state:
     st.session_state.wartosc_rabatu = 10  # Domyślny rabat startowy
 
-# Akcja analizy - przywrócono type="primary" (kolor niebieski)
+# Akcja analizy
 if st.button("Analizuj zapytanie i dobierz części", type="primary"):
     st.session_state.analiza_zrobiona = True
     with st.spinner("Analiza NLP zapytania i przeszukiwanie bazy wektorowej..."):
@@ -85,34 +85,38 @@ if st.session_state.analiza_zrobiona:
             st.write(f"**Liczba wybranych części:** {len(wybrane_czesci)} szt.")
             st.write(f"**Cena wyjściowa pakietu:** {cena_katalogowa:.2f} PLN")
 
-            # --- CSS DLA NIEBIESKIEGO SUWAKA I PRZYCISKÓW ---
+            # --- CSS DLA CZYSTEJ, CIENKIEJ I W PEŁNI NIEBIESKIEJ LINII ---
             st.markdown("""
                 <style>
-                    /* Ukrycie domyślnego tła kontenerów suwaka */
+                    /* 1. USUNIĘCIE GRUBEGO TŁA Z GŁÓWNYCH KONTENERÓW */
                     div[data-testid="stSlider"] > div {
                         background: transparent !important;
                     }
-                    
-                    /* Prawa strona linii suwaka (nieaktywna) - niebieska */
+                    div[data-testid="stSlider"] div[data-baseweb="slider"] {
+                        background: transparent !important;
+                    }
                     div[data-testid="stSlider"] div[data-baseweb="slider"] > div {
-                        background: #007BFF !important;
-                        height: 4px !important;
+                        background: transparent !important;
                     }
                     
-                    /* Lewa strona linii suwaka (aktywna) - niebieska */
+                    /* 2. ZMUSZENIE CAŁEJ ŚCIEŻKI DO BYCIA NIEBIESKĄ LINIA (Niszczy domyślną czerwień) */
                     div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {
                         background: #007BFF !important;
                         height: 4px !important;
                     }
+                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div > div {
+                        background: #007BFF !important;
+                        height: 4px !important;
+                    }
                     
-                    /* Kropka suwaka - niebieska */
+                    /* 3. KROPKA SUWAKA */
                     div[data-testid="stSlider"] div[role="slider"] {
                         background-color: #007BFF !important;
                         border: 2px solid #007BFF !important;
                         box-shadow: none !important;
                     }
                     
-                    /* Dymek z cyfrą (Tooltip) - białe tło, niebieska ramka i tekst */
+                    /* 4. DYMEK Z CYFRĄ (Białe tło, niebieski tekst i ramka dla kontrastu) */
                     div[data-testid="stSlider"] div[role="slider"] > div {
                         font-size: 20px !important;
                         font-weight: 900 !important;
@@ -123,14 +127,14 @@ if st.session_state.analiza_zrobiona:
                         padding: 2px 8px !important;
                     }
                     
-                    /* Etykieta nad suwakiem - niebieska */
+                    /* 5. ETYKIETA NAD SUWAKIEM */
                     div[data-testid="stSlider"] label {
                         font-size: 20px !important;
                         font-weight: bold !important;
                         color: #007BFF !important;
                     }
 
-                    /* Wszystkie przyciski typu "primary" (Analizuj oraz Zamówienie) na niebiesko */
+                    /* 6. WSZYSTKIE GŁÓWNE PRZYCISKI NA NIEBIESKO */
                     div[data-testid="stButton"] button[kind="primary"] {
                         background-color: #007BFF !important;
                         border-color: #007BFF !important;
