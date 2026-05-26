@@ -12,6 +12,68 @@ def load_data():
 # Wczytanie danych
 df = load_data()
 
+# --- GLOBALNY STYL CSS (Wymusza niebieski kolor od samego początku działania aplikacji) ---
+st.markdown("""
+    <style>
+        /* 1. USUNIĘCIE GRUBEGO TŁA Z GŁÓWNYCH KONTENERÓW SUWAKA */
+        div[data-testid="stSlider"] > div {
+            background: transparent !important;
+        }
+        div[data-testid="stSlider"] div[data-baseweb="slider"] {
+            background: transparent !important;
+        }
+        div[data-testid="stSlider"] div[data-baseweb="slider"] > div {
+            background: transparent !important;
+        }
+        
+        /* 2. ZMUSZENIE CAŁEJ ŚCIEŻKI DO BYCIA NIEBIESKĄ LINIĄ */
+        div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {
+            background: #007BFF !important;
+            height: 4px !important;
+        }
+        div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div > div {
+            background: #007BFF !important;
+            height: 4px !important;
+        }
+        
+        /* 3. KROPKA SUWAKA */
+        div[data-testid="stSlider"] div[role="slider"] {
+            background-color: #007BFF !important;
+            border: 2px solid #007BFF !important;
+            box-shadow: none !important;
+        }
+        
+        /* 4. DYMEK Z CYFRĄ (Białe tło, niebieski tekst i ramka dla kontrastu) */
+        div[data-testid="stSlider"] div[role="slider"] > div {
+            font-size: 20px !important;
+            font-weight: 900 !important;
+            color: #007BFF !important;
+            background-color: white !important;
+            border: 2px solid #007BFF !important;
+            border-radius: 6px !important;
+            padding: 2px 8px !important;
+        }
+        
+        /* 5. ETYKIETA NAD SUWAKIEM */
+        div[data-testid="stSlider"] label {
+            font-size: 20px !important;
+            font-weight: bold !important;
+            color: #007BFF !important;
+        }
+
+        /* 6. WSZYSTKIE GŁÓWNE PRZYCISKI NA NIEBIESKO (Analizuj oraz Zamówienie) */
+        div[data-testid="stButton"] button[kind="primary"] {
+            background-color: #007BFF !important;
+            border-color: #007BFF !important;
+            color: white !important;
+        }
+        div[data-testid="stButton"] button[kind="primary"]:hover {
+            background-color: #0056b3 !important;
+            border-color: #0056b3 !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # Nagłówek aplikacji
 st.title("🤖 AI Sales Copilot - AutoPartner Max S.A.")
 st.markdown("Asystent RAG wspierający proces ofertowania i weryfikację marży.")
@@ -84,68 +146,6 @@ if st.session_state.analiza_zrobiona:
 
             st.write(f"**Liczba wybranych części:** {len(wybrane_czesci)} szt.")
             st.write(f"**Cena wyjściowa pakietu:** {cena_katalogowa:.2f} PLN")
-
-            # --- CSS DLA CZYSTEJ, CIENKIEJ I W PEŁNI NIEBIESKIEJ LINII ---
-            st.markdown("""
-                <style>
-                    /* 1. USUNIĘCIE GRUBEGO TŁA Z GŁÓWNYCH KONTENERÓW */
-                    div[data-testid="stSlider"] > div {
-                        background: transparent !important;
-                    }
-                    div[data-testid="stSlider"] div[data-baseweb="slider"] {
-                        background: transparent !important;
-                    }
-                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div {
-                        background: transparent !important;
-                    }
-                    
-                    /* 2. ZMUSZENIE CAŁEJ ŚCIEŻKI DO BYCIA NIEBIESKĄ LINIA (Niszczy domyślną czerwień) */
-                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {
-                        background: #007BFF !important;
-                        height: 4px !important;
-                    }
-                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div > div {
-                        background: #007BFF !important;
-                        height: 4px !important;
-                    }
-                    
-                    /* 3. KROPKA SUWAKA */
-                    div[data-testid="stSlider"] div[role="slider"] {
-                        background-color: #007BFF !important;
-                        border: 2px solid #007BFF !important;
-                        box-shadow: none !important;
-                    }
-                    
-                    /* 4. DYMEK Z CYFRĄ (Białe tło, niebieski tekst i ramka dla kontrastu) */
-                    div[data-testid="stSlider"] div[role="slider"] > div {
-                        font-size: 20px !important;
-                        font-weight: 900 !important;
-                        color: #007BFF !important;
-                        background-color: white !important;
-                        border: 2px solid #007BFF !important;
-                        border-radius: 6px !important;
-                        padding: 2px 8px !important;
-                    }
-                    
-                    /* 5. ETYKIETA NAD SUWAKIEM */
-                    div[data-testid="stSlider"] label {
-                        font-size: 20px !important;
-                        font-weight: bold !important;
-                        color: #007BFF !important;
-                    }
-
-                    /* 6. WSZYSTKIE GŁÓWNE PRZYCISKI NA NIEBIESKO */
-                    div[data-testid="stButton"] button[kind="primary"] {
-                        background-color: #007BFF !important;
-                        border-color: #007BFF !important;
-                        color: white !important;
-                    }
-                    div[data-testid="stButton"] button[kind="primary"]:hover {
-                        background-color: #0056b3 !important;
-                        border-color: #0056b3 !important;
-                    }
-                </style>
-            """, unsafe_allow_html=True)
 
             # --- SUWAK ---
             aktualny_rabat = st.session_state.wartosc_rabatu
