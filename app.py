@@ -93,85 +93,21 @@ if st.session_state.analiza_zrobiona:
             else:
                 kolor = "#28A745" # Zielony
 
-            # Kod CSS modyfikujący wyłącznie suwak i przycisk
+            # Zoptymalizowany kod CSS - koloruje wyłącznie cienką linię, kropkę i tekst
             st.markdown(f"""
                 <style>
-                    /* Lżejsze tło dla nieaktywnej części paska (dodane '40' to przezroczystość hex) */
+                    /* Wyczyszczenie tła wokół kontenera (usuwa szeroki zielony/czerwony pas) */
                     div[data-testid="stSlider"] div[data-baseweb="slider"] > div {{
-                        background: {kolor}40 !important;
+                        background: transparent !important;
                     }}
                     
-                    /* Pełny kolor dla aktywnej części paska (od lewej do kropki) */
+                    /* Cienka linia suwaka - cała w jednym kolorze (prawa i lewa strona) */
                     div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {{
+                        background: {kolor} !important;
+                    }}
+                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div > div {{
                         background: {kolor} !important;
                     }}
                     
                     /* Kropka suwaka */
-                    div[data-testid="stSlider"] div[role="slider"] {{
-                        background-color: {kolor} !important;
-                        border-color: {kolor} !important;
-                        box-shadow: 0 0 8px {kolor}60 !important;
-                    }}
-                    
-                    /* Dymek z cyfrą (Tooltip) - BIAŁE TŁO, żeby tekst był czytelny! */
-                    div[data-testid="stSlider"] div[role="slider"] > div {{
-                        font-size: 22px !important;
-                        font-weight: 900 !important;
-                        color: {kolor} !important;
-                        background-color: white !important;
-                        border: 2px solid {kolor} !important;
-                        border-radius: 6px !important;
-                        padding: 2px 8px !important;
-                    }}
-                    
-                    /* Etykieta nad suwakiem */
-                    div[data-testid="stSlider"] label {{
-                        font-size: 20px !important;
-                        font-weight: bold !important;
-                        color: {kolor} !important;
-                    }}
-
-                    /* Przycisk zamówienia (Niebieski) */
-                    div[data-testid="stButton"] button[kind="primary"] {{
-                        background-color: #007BFF !important;
-                        border-color: #007BFF !important;
-                        color: white !important;
-                    }}
-                    div[data-testid="stButton"] button[kind="primary"]:hover {{
-                        background-color: #0056b3 !important;
-                        border-color: #0056b3 !important;
-                    }}
-                </style>
-            """, unsafe_allow_html=True)
-
-            # --- SUWAK ---
-            proponowany_rabat = st.slider(
-                f"Ustal rabat dla warsztatu ({aktualny_rabat}%)", 
-                min_value=0, 
-                max_value=30, 
-                key="wartosc_rabatu"
-            )
-            
-            # --- PODSUMOWANIE ---
-            cena_po_rabacie = cena_katalogowa * (1 - proponowany_rabat / 100)
-            st.markdown(f"### Cena ostateczna po rabacie: {cena_po_rabacie:.2f} PLN")
-
-            if proponowany_rabat > srednia_min_marza:
-                st.error(
-                    f"⚠️ **UWAGA:** Udzielony rabat ({proponowany_rabat}%) jest wyższy niż średnia "
-                    f"minimalna marża tego pakietu ({srednia_min_marza:.1f}%). Oferta wymaga akceptacji kierownika."
-                )
-            else:
-                st.success(
-                    f"✅ **Rabat w normie:** {proponowany_rabat}% to bezpieczna wartość. Marża operacyjna jest chroniona."
-                )
-
-            st.divider()
-            
-            # --- ZŁÓŻ ZAMÓWIENIE ---
-            if st.button("🛒 Złóż zamówienie", type="primary", use_container_width=True):
-                st.success("✅ Zamówienie zostało pomyślnie skompletowane i przesłane do systemu ERP! Generowanie listu przewozowego...")
-                st.balloons() 
-
-    else:
-        st.warning("Brak części spełniających kryteria w bazie danych.")
+                    div
