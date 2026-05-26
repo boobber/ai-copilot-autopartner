@@ -79,4 +79,99 @@ if st.session_state.analiza_zrobiona:
         if wybrane_czesci.empty:
             st.info("👆 Zaznacz co najmniej jedną część z tabeli powyżej, aby zbudować pakiet i przeliczyć ofertę.")
         else:
-            cena_katalogowa = wybrane_czesci['
+            cena_katalogowa = wybrane_czesci['Cena_Katalogowa'].sum()
+            srednia_min_marza = wybrane_czesci['Min_Marza_Procent'].mean()
+
+            st.write(f"**Liczba wybranych części:** {len(wybrane_czesci)} szt.")
+            st.write(f"**Cena wyjściowa pakietu:** {cena_katalogowa:.2f} PLN")
+
+            # --- CSS DLA NIEBIESKIEGO SUWAKA I PRZYCISKÓW ---
+            st.markdown("""
+                <style>
+                    /* Ukrycie domyślnego tła kontenerów suwaka */
+                    div[data-testid="stSlider"] > div {
+                        background: transparent !important;
+                    }
+                    
+                    /* Prawa strona linii suwaka (nieaktywna) - niebieska */
+                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div {
+                        background: #007BFF !important;
+                        height: 4px !important;
+                    }
+                    
+                    /* Lewa strona linii suwaka (aktywna) - niebieska */
+                    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {
+                        background: #007BFF !important;
+                        height: 4px !important;
+                    }
+                    
+                    /* Kropka suwaka - niebieska */
+                    div[data-testid="stSlider"] div[role="slider"] {
+                        background-color: #007BFF !important;
+                        border: 2px solid #007BFF !important;
+                        box-shadow: none !important;
+                    }
+                    
+                    /* Dymek z cyfrą (Tooltip) - białe tło, niebieska ramka i tekst */
+                    div[data-testid="stSlider"] div[role="slider"] > div {
+                        font-size: 20px !important;
+                        font-weight: 900 !important;
+                        color: #007BFF !important;
+                        background-color: white !important;
+                        border: 2px solid #007BFF !important;
+                        border-radius: 6px !important;
+                        padding: 2px 8px !important;
+                    }
+                    
+                    /* Etykieta nad suwakiem - niebieska */
+                    div[data-testid="stSlider"] label {
+                        font-size: 20px !important;
+                        font-weight: bold !important;
+                        color: #007BFF !important;
+                    }
+
+                    /* Wszystkie przyciski typu "primary" (Analizuj oraz Zamówienie) na niebiesko */
+                    div[data-testid="stButton"] button[kind="primary"] {
+                        background-color: #007BFF !important;
+                        border-color: #007BFF !important;
+                        color: white !important;
+                    }
+                    div[data-testid="stButton"] button[kind="primary"]:hover {
+                        background-color: #0056b3 !important;
+                        border-color: #0056b3 !important;
+                    }
+                </style>
+            """, unsafe_allow_html=True)
+
+            # --- SUWAK ---
+            aktualny_rabat = st.session_state.wartosc_rabatu
+            proponowany_rabat = st.slider(
+                f"Ustal rabat dla warsztatu ({aktualny_rabat}%)", 
+                min_value=0, 
+                max_value=30, 
+                key="wartosc_rabatu"
+            )
+            
+            # --- PODSUMOWANIE ---
+            cena_po_rabacie = cena_katalogowa * (1 - proponowany_rabat / 100)
+            st.markdown(f"### Cena ostateczna po rabacie: {cena_po_rabacie:.2f} PLN")
+
+            if proponowany_rabat > srednia_min_marza:
+                st.error(
+                    f"⚠️ **UWAGA:** Udzielony rabat ({proponowany_rabat}%) jest wyższy niż średnia "
+                    f"minimalna marża tego pakietu ({srednia_min_marza:.1f}%). Oferta wymaga akceptacji kierownika."
+                )
+            else:
+                st.success(
+                    f"✅ **Rabat w normie:** {proponowany_rabat}% to bezpieczna wartość. Marża operacyjna jest chroniona."
+                )
+
+            st.divider()
+            
+            # --- ZŁÓŻ ZAMÓWIENIE ---
+            if st.button("🛒 Złóż zamówienie", type="primary", use_container_width=True):
+                st.success("✅ Zamówienie zostało pomyślnie skompletowane i przesłane do systemu ERP! Generowanie listu przewozowego...")
+                st.balloons() 
+
+    else:
+        st.warning("Brak części spełniających kryteria w bazie danych.")
