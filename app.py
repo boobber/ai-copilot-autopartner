@@ -35,7 +35,7 @@ if "analiza_zrobiona" not in st.session_state:
 if "wartosc_rabatu" not in st.session_state:
     st.session_state.wartosc_rabatu = 10  # Domyślny rabat startowy
 
-# Akcja analizy - usunięto type="primary", aby niebieski był tylko przycisk zamówienia
+# Akcja analizy
 if st.button("Analizuj zapytanie i dobierz części"):
     st.session_state.analiza_zrobiona = True
     with st.spinner("Analiza NLP zapytania i przeszukiwanie bazy wektorowej..."):
@@ -88,18 +88,20 @@ if st.session_state.analiza_zrobiona:
             # --- CSS DLA SUWAKA I PRZYCISKU ---
             aktualny_rabat = st.session_state.wartosc_rabatu
             
-            # Definiujemy jeden, konkretny kolor dla danej sytuacji
             if aktualny_rabat > srednia_min_marza:
                 kolor = "#FF4B4B" # Czerwony
             else:
                 kolor = "#28A745" # Zielony
 
+            # Kod CSS modyfikujący wyłącznie suwak i przycisk
             st.markdown(f"""
                 <style>
-                    /* Cała linia suwaka (tło i aktywny pasek) w JEDNYM kolorze */
+                    /* Lżejsze tło dla nieaktywnej części paska (dodane '40' to przezroczystość hex) */
                     div[data-testid="stSlider"] div[data-baseweb="slider"] > div {{
-                        background: {kolor} !important;
+                        background: {kolor}40 !important;
                     }}
+                    
+                    /* Pełny kolor dla aktywnej części paska (od lewej do kropki) */
                     div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {{
                         background: {kolor} !important;
                     }}
@@ -108,24 +110,28 @@ if st.session_state.analiza_zrobiona:
                     div[data-testid="stSlider"] div[role="slider"] {{
                         background-color: {kolor} !important;
                         border-color: {kolor} !important;
-                        box-shadow: 0 0 10px {kolor}60 !important;
+                        box-shadow: 0 0 8px {kolor}60 !important;
                     }}
                     
-                    /* Powiększona liczba nad kropką (tooltip) i jej kolor */
+                    /* Dymek z cyfrą (Tooltip) - BIAŁE TŁO, żeby tekst był czytelny! */
                     div[data-testid="stSlider"] div[role="slider"] > div {{
-                        font-size: 24px !important;
+                        font-size: 22px !important;
                         font-weight: 900 !important;
                         color: {kolor} !important;
+                        background-color: white !important;
+                        border: 2px solid {kolor} !important;
+                        border-radius: 6px !important;
+                        padding: 2px 8px !important;
                     }}
                     
-                    /* Kolor i rozmiar tekstu w etykiecie nad suwakiem (w tym procentu) */
+                    /* Etykieta nad suwakiem */
                     div[data-testid="stSlider"] label {{
                         font-size: 20px !important;
                         font-weight: bold !important;
                         color: {kolor} !important;
                     }}
 
-                    /* Zmiana koloru przycisku "primary" (Złóż zamówienie) na niebieski */
+                    /* Przycisk zamówienia (Niebieski) */
                     div[data-testid="stButton"] button[kind="primary"] {{
                         background-color: #007BFF !important;
                         border-color: #007BFF !important;
@@ -162,10 +168,10 @@ if st.session_state.analiza_zrobiona:
 
             st.divider()
             
-            # --- ZŁÓŻ ZAMÓWIENIE (Przycisk na niebiesko) ---
+            # --- ZŁÓŻ ZAMÓWIENIE ---
             if st.button("🛒 Złóż zamówienie", type="primary", use_container_width=True):
                 st.success("✅ Zamówienie zostało pomyślnie skompletowane i przesłane do systemu ERP! Generowanie listu przewozowego...")
-                st.balloons() # Efekt wizualny potwierdzający akcję
+                st.balloons() 
 
     else:
         st.warning("Brak części spełniających kryteria w bazie danych.")
